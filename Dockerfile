@@ -23,7 +23,6 @@ WORKDIR /workspace/psychec
 # `stack setup` earlier and take advantage of Docker layer caching so the
 # expensive GHC download is not repeated when unrelated files change.
 COPY solver/stack.yaml /workspace/psychec/solver/stack.yaml
-COPY solver/stack.yaml.lock /workspace/psychec/solver/stack.yaml.lock
 COPY solver/psychecsolver.cabal /workspace/psychec/solver/psychecsolver.cabal
 
 # Run stack setup (cached by Docker layer while `solver/stack.yaml` unchanged)
