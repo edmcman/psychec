@@ -15,10 +15,10 @@ RUN apt-get update \
     ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
+USER vscode
+
 # Set working directory to the repository root inside the container
 WORKDIR /workspace/psychec
-
-USER vscode
 
 # Copy minimal resolver files for cached setup of stack/GHC
 # Copying only `solver/stack.yaml` and the cabal file means we can run
