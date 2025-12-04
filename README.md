@@ -36,17 +36,8 @@ To run the default `reconstruct.py` entrypoint in a container, prefer not to mou
 
 Recommended usage patterns:
 
-- Mount only specific files you want to test, instead of the entire repo (keeps image artifacts intact):
+- Mount the full repository for local development, but mount it into a *different* path (for example `/host-project`) so the image's prebuilt binaries and libraries under `/workspace/psychec` are not hidden by the host volume. This lets you read/write files from the host while keeping the image binaries intact.
 
 ```
-docker run --rm -v "$PWD/test.c":/workspace/psychec/test.c ghcr.io/edmcman/psychec-typeinference-docker:original /workspace/psychec/test.c
+docker run --rm -v "$PWD":/host-project -e OUTPUT_DIR=/host-project/out ghcr.io/edmcman/psychec-typeinference-docker:original /workspace/psychec/reconstruct.py /host-project/test.c
 ```
-
-- If you must mount the full repo for local development, mount it into a different path and pass the input file path to the image so the prebuilt binaries in `/workspace/psychec` remain accessible. Example:
-
-```
-docker run --rm -v "$PWD":/host-project ghcr.io/edmcman/psychec-typeinference-docker:original /workspace/psychec/reconstruct.py /host-project/test.c
-```
-
-Note: If you mount the full project into the container and run `stack` inside the mount, you may run into permissions issues caused by mismatched UID/GID between the host user and the container build user. See the Troubleshooting section below for ways to avoid or fix that.
-

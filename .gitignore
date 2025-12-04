@@ -1,3 +1,14 @@
+# Ignore build outputs, temporary, and mount output directory
+/out
+build/
+*.o
+*.a
+*.so
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+psychecgen
+__pycache__/
 *~
 *.glob
 *.aux
