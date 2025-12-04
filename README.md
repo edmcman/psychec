@@ -34,10 +34,12 @@ If you are maintaining a fork and want to publish images to GHCR under your acco
 
 To run the default `reconstruct.py` entrypoint in a container, prefer not to mount your repository root on top of the image's `/workspace/psychec` path — doing so will hide the image's prebuilt binaries and libraries and can cause runtime failures such as missing shared libraries (e.g., `libpsychecfe.so`).
 
-Recommended usage patterns:
+Example usage:
 
-- Mount the full repository for local development, but mount it into a *different* path (for example `/host-project`) so the image's prebuilt binaries and libraries under `/workspace/psychec` are not hidden by the host volume. This lets you read/write files from the host while keeping the image binaries intact.
+Mount the directory `/path/to/dir` containing your input C files `/path/to/dir/file.c` to `/files` and psychec's output will be written to the same directory:
 
 ```
-docker run --rm -v "$PWD":/host-project -e OUTPUT_DIR=/host-project/out ghcr.io/edmcman/psychec-typeinference-docker:original /workspace/psychec/reconstruct.py /host-project/test.c
+docker run --rm -v "/path/to/dir":/files ghcr.io/edmcman/psychec-typeinference-docker:original /files/file.c
 ```
+
+This will produce `file_gen.h` and `file_fixed.c` in `/path/to/dir`.
