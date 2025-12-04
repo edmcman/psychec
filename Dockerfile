@@ -18,6 +18,8 @@ RUN apt-get update \
 # Set working directory to the repository root inside the container
 WORKDIR /workspace/psychec
 
+USER vscode
+
 # Copy minimal resolver files for cached setup of stack/GHC
 # Copying only `solver/stack.yaml` and the cabal file means we can run
 # `stack setup` earlier and take advantage of Docker layer caching so the
