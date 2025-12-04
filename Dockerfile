@@ -17,6 +17,8 @@ RUN apt-get update \
 
 USER vscode
 
+RUN mkdir -p /workspace/psychec
+
 # Set working directory to the repository root inside the container
 WORKDIR /workspace/psychec
 
