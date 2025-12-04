@@ -25,7 +25,7 @@ Important: The `original` branch is not actively maintained; the Docker image pr
 Images are published to GHCR as `ghcr.io/<owner>/psychec:<tag>` (the workflow tags images using branch or tag names). For example, to pull the image published by the repository owner:
 
 ```
-docker pull ghcr.io/edmcman/psychec:original
+docker pull ghcr.io/edmcman/psychec-typeinference-docker:original
 ```
 
 If you have your own fork, replace `edmcman` with the appropriate owner. The image is tagged by the branch name (e.g., `original`) or the tag name (e.g., `v1.2.3`) when the workflow runs on a push or release tag.
@@ -39,41 +39,20 @@ Recommended usage patterns:
 - Use the image without mounting the repository root (recommended if you only need the prebuilt binaries):
 
 ```
-docker run --rm ghcr.io/edmcman/psychec:original /workspace/psychec/myfile.c
+docker run --rm ghcr.io/edmcman/psychec-typeinference-docker:original /workspace/psychec/myfile.c
 ```
 
 - Mount only specific files you want to test, instead of the entire repo (keeps image artifacts intact):
 
 ```
-docker run --rm -v "$PWD/test.c":/workspace/psychec/test.c ghcr.io/edmcman/psychec:original /workspace/psychec/test.c
+docker run --rm -v "$PWD/test.c":/workspace/psychec/test.c ghcr.io/edmcman/psychec-typeinference-docker:original /workspace/psychec/test.c
 ```
 
 - If you must mount the full repo for local development, mount it into a different path and pass the input file path to the image so the prebuilt binaries in `/workspace/psychec` remain accessible. Example:
 
 ```
-docker run --rm -v "$PWD":/host-project ghcr.io/edmcman/psychec:original /workspace/psychec/reconstruct.py /host-project/test.c
+docker run --rm -v "$PWD":/host-project ghcr.io/edmcman/psychec-typeinference-docker:original /workspace/psychec/reconstruct.py /host-project/test.c
 ```
 
 Note: If you mount the full project into the container and run `stack` inside the mount, you may run into permissions issues caused by mismatched UID/GID between the host user and the container build user. See the Troubleshooting section below for ways to avoid or fix that.
 
-## Advanced usage and tips
-
-If you need to inspect or modify the environment interactively, run a shell in the container — mount your repo into a different path (e.g., `/host-project`) and prefer running as your host user to avoid UID/GID mismatches:
-
-```
-docker run --rm -it --user $(id -u):$(id -g) -v "$PWD":/host-project ghcr.io/edmcman/psychec:original bash
-```
-
-From the shell you can run the prebuilt tool inside `/workspace/psychec` or use files under `/host-project` for development and debugging.
-
-- To create a reproducible CI step that uses this image, use `docker pull` then run commands against the image in your workflow.
-
-- Multi-arch and caching: the workflow supports adding platforms and layer cache settings. If you'd like multi-arch builds (e.g., `linux/amd64,linux/arm64`), we can add that to the GitHub Actions workflow.
-
-- Tagging policy: push tags with `vX.Y.Z` to publish versioned images. The workflow also publishes images when changes are pushed to the defined branches.
-
-If you need help or have a preferred tag/visibility or publishing policy, tell me and I will update the workflow and README accordingly.
-
-To infer the types of an incomplete C program (or program fragment):
-
-<img width="473" alt="Screen Shot 2022-02-20 at 09 43 12" src="https://user-images.githubusercontent.com/2905588/154843011-ea519d92-0c72-41f9-87e2-e4f6f3cc6214.png">
