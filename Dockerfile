@@ -24,14 +24,14 @@ USER vscode
 # Copying only `solver/stack.yaml` and the cabal file means we can run
 # `stack setup` earlier and take advantage of Docker layer caching so the
 # expensive GHC download is not repeated when unrelated files change.
-COPY solver/stack.yaml /workspace/psychec/solver/stack.yaml
-COPY solver/psychecsolver.cabal /workspace/psychec/solver/psychecsolver.cabal
+COPY --chown=vscode solver/stack.yaml /workspace/psychec/solver/stack.yaml
+COPY --chown=vscode solver/psychecsolver.cabal /workspace/psychec/solver/psychecsolver.cabal
 
 # Run stack setup (cached by Docker layer while `solver/stack.yaml` unchanged)
-RUN cd /workspace/psychec/solver && stack setup && stack build --only-dependencies
+RUN cd /workspace/psychec/solver && stack setup
 
 # Copy the rest of the project sources
-COPY . /workspace/psychec
+COPY --chown=vscode . /workspace/psychec
 
 # Ensure reconstruct.py is executable and run build steps similar to postCreateCommand
 RUN chmod +x ./reconstruct.py \
