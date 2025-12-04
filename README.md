@@ -36,12 +36,6 @@ To run the default `reconstruct.py` entrypoint in a container, prefer not to mou
 
 Recommended usage patterns:
 
-- Use the image without mounting the repository root (recommended if you only need the prebuilt binaries):
-
-```
-docker run --rm ghcr.io/edmcman/psychec-typeinference-docker:original /workspace/psychec/myfile.c
-```
-
 - Mount only specific files you want to test, instead of the entire repo (keeps image artifacts intact):
 
 ```
