@@ -32,21 +32,39 @@ If you have your own fork, replace `edmcman` with the appropriate owner. The ima
 
 If you are maintaining a fork and want to publish images to GHCR under your account, simply enable GitHub Actions for your fork and the included workflow will authenticate using `GITHUB_TOKEN` and publish images under `ghcr.io/<your-username>/psychec` for push and tag events. You can control package visibility for your images from your GitHub package settings if you need public or private images.
 
-To run the default `reconstruct.py` entrypoint in a container, mount a directory containing your C file and run:
+To run the default `reconstruct.py` entrypoint in a container, prefer not to mount your repository root on top of the image's `/workspace/psychec` path — doing so will hide the image's prebuilt binaries and libraries and can cause runtime failures such as missing shared libraries (e.g., `libpsychecfe.so`).
+
+Recommended usage patterns:
+
+- Use the image without mounting the repository root (recommended if you only need the prebuilt binaries):
 
 ```
-docker run --rm -v "$PWD":/workspace/psychec ghcr.io/edmcman/psychec:original /workspace/psychec/myfile.c
+docker run --rm ghcr.io/edmcman/psychec:original /workspace/psychec/myfile.c
 ```
 
-This runs the `reconstruct.py` script inside the container with `/workspace/psychec/myfile.c` as the input file. As a convenience, the image uses `/workspace/psychec` as the repository path inside the container, so files are accessible there when mounted via `-v`.
+- Mount only specific files you want to test, instead of the entire repo (keeps image artifacts intact):
+
+```
+docker run --rm -v "$PWD/test.c":/workspace/psychec/test.c ghcr.io/edmcman/psychec:original /workspace/psychec/test.c
+```
+
+- If you must mount the full repo for local development, mount it into a different path and pass the input file path to the image so the prebuilt binaries in `/workspace/psychec` remain accessible. Example:
+
+```
+docker run --rm -v "$PWD":/host-project ghcr.io/edmcman/psychec:original /workspace/psychec/reconstruct.py /host-project/test.c
+```
+
+Note: If you mount the full project into the container and run `stack` inside the mount, you may run into permissions issues caused by mismatched UID/GID between the host user and the container build user. See the Troubleshooting section below for ways to avoid or fix that.
 
 ## Advanced usage and tips
 
-- If you need to inspect or modify the environment interactively, run a shell in the container:
+If you need to inspect or modify the environment interactively, run a shell in the container — mount your repo into a different path (e.g., `/host-project`) and prefer running as your host user to avoid UID/GID mismatches:
 
 ```
-docker run --rm -it -v "$PWD":/workspace/psychec ghcr.io/edmcman/psychec:original bash
+docker run --rm -it --user $(id -u):$(id -g) -v "$PWD":/host-project ghcr.io/edmcman/psychec:original bash
 ```
+
+From the shell you can run the prebuilt tool inside `/workspace/psychec` or use files under `/host-project` for development and debugging.
 
 - To create a reproducible CI step that uses this image, use `docker pull` then run commands against the image in your workflow.
 
