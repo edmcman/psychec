@@ -23,6 +23,7 @@ jobs:
     - name: build solver
       run: |
         cd solver
+        stack setup
         stack build
     - name: test
       run: |

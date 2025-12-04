@@ -35,7 +35,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "cd solver && stack build && cd .. && cmake . && make -j4",
+	"postCreateCommand": "cd solver && stack setup && stack build && cd .. && cmake . && make -j4",
 
 	// Configure tool-specific properties.
 	// "customizations": {},

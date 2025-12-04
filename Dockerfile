@@ -18,12 +18,22 @@ RUN apt-get update \
 # Set working directory to the repository root inside the container
 WORKDIR /workspace/psychec
 
-# Copy the project sources
+# Copy minimal resolver files for cached setup of stack/GHC
+# Copying only `solver/stack.yaml` and the cabal file means we can run
+# `stack setup` earlier and take advantage of Docker layer caching so the
+# expensive GHC download is not repeated when unrelated files change.
+COPY solver/stack.yaml /workspace/psychec/solver/stack.yaml
+COPY solver/psychecsolver.cabal /workspace/psychec/solver/psychecsolver.cabal
+
+# Run stack setup (cached by Docker layer while `solver/stack.yaml` unchanged)
+RUN cd /workspace/psychec/solver && stack setup
+
+# Copy the rest of the project sources
 COPY . /workspace/psychec
 
 # Ensure reconstruct.py is executable and run build steps similar to postCreateCommand
 RUN chmod +x ./reconstruct.py \
- && cd solver && stack setup && stack build && cd .. \
+ && cd solver && stack build && cd .. \
  && cmake . && make -j4
 
 # Default working directory and entrypoint
